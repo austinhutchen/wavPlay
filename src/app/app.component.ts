@@ -39,10 +39,6 @@ this.mediaRecorder.ondataavailable = (e: BlobEvent) => {
   this.chunks.push(e.data);
 };
 
-this.mediaRecorder.onstop = (e: Event) => {
-  // your code here
-};
-
         this.mediaRecorder.onstop = e => {
           let blob = new Blob(this.chunks, { 'type' : 'audio/ogg; codecs=opus' });
           let audioURL = window.URL.createObjectURL(blob);
