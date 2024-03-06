@@ -1,7 +1,8 @@
 # WavPlay
 https://wavplay.vercel.app/
 <br/>
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.5.It uses the navigator.mediaDevices.getUserMedia method to get access to the user’s microphone.
+<h2> This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.5.It uses the navigator.mediaDevices.getUserMedia method to get access to the user’s microphone. </h2>
+<hr/>
 <ul>
 <li>
 It creates an AudioContext and a MediaStreamSource from the user’s microphone stream.  
