@@ -15,9 +15,8 @@ audioContext: AudioContext = new AudioContext();
 analyser: AnalyserNode = this.audioContext.createAnalyser();
 dataArray: Uint8Array = new Uint8Array(this.analyser.frequencyBinCount);
 canvasContext: CanvasRenderingContext2D;
+  @ViewChild('canvas') canvas!: ElementRef<HTMLCanvasElement>;
 
-  @ViewChild('canvas') canvas: ElementRef;
-  canvasContext: CanvasRenderingContext2D;
 ngAfterViewInit() {
   this.canvasContext = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
 }
