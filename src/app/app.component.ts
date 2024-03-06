@@ -20,7 +20,11 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.canvasContext = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
   }
-
+init() {
+  this.audioContext.resume().then(() => {
+    this.startRecording();
+  });
+}
   startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
