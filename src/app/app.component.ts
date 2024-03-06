@@ -1,25 +1,25 @@
 // app.component.ts
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-@ViewChild('canvas') canvas!: ElementRef;
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  standalone: true
 })
 export class AppComponent implements AfterViewInit {
-  title = 'Audio Recorder';
-chunks: Blob[] = [];
-  mediaRecorder: any;
-audioContext: AudioContext = new AudioContext();
-analyser: AnalyserNode = this.audioContext.createAnalyser();
-dataArray: Uint8Array = new Uint8Array(this.analyser.frequencyBinCount);
-canvasContext: CanvasRenderingContext2D;
-  @ViewChild('canvas') canvas!: ElementRef<HTMLCanvasElement>;
 
-ngAfterViewInit() {
-  this.canvasContext = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-}
+  title = 'Audio Recorder';
+  chunks: Blob[] = [];
+  mediaRecorder: any;
+  audioContext: AudioContext = new AudioContext();
+  analyser: AnalyserNode = this.audioContext.createAnalyser();
+  dataArray: Uint8Array = new Uint8Array(this.analyser.frequencyBinCount);
+  @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
+  canvasContext!: CanvasRenderingContext2D;
+  ngAfterViewInit() {
+    this.canvasContext = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+  }
 
   startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -34,12 +34,12 @@ ngAfterViewInit() {
         this.mediaRecorder = new MediaRecorder(stream);
         this.mediaRecorder.start();
 
-this.mediaRecorder.ondataavailable = (e: BlobEvent) => {
-  this.chunks.push(e.data);
-};
+        this.mediaRecorder.ondataavailable = (e: BlobEvent) => {
+          this.chunks.push(e.data);
+        };
 
-        this.mediaRecorder.onstop = e => {
-          let blob = new Blob(this.chunks, { 'type' : 'audio/ogg; codecs=opus' });
+        this.mediaRecorder.onstop = () => {
+          let blob = new Blob(this.chunks, { 'type': 'audio/ogg; codecs=opus' });
           let audioURL = window.URL.createObjectURL(blob);
           let audio = new Audio(audioURL);
           audio.play();
@@ -63,11 +63,11 @@ this.mediaRecorder.ondataavailable = (e: BlobEvent) => {
     var sliceWidth = this.canvas.nativeElement.width * 1.0 / this.analyser.frequencyBinCount;
     var x = 0;
 
-    for(var i = 0; i < this.analyser.frequencyBinCount; i++) {
+    for (var i = 0; i < this.analyser.frequencyBinCount; i++) {
       var v = this.dataArray[i] / 128.0;
-      var y = v * this.canvas.nativeElement.height/2;
+      var y = v * this.canvas.nativeElement.height / 2;
 
-      if(i === 0) {
+      if (i === 0) {
         this.canvasContext.moveTo(x, y);
       } else {
         this.canvasContext.lineTo(x, y);
@@ -76,7 +76,7 @@ this.mediaRecorder.ondataavailable = (e: BlobEvent) => {
       x += sliceWidth;
     }
 
-    this.canvasContext.lineTo(this.canvas.nativeElement.width, this.canvas.nativeElement.height/2);
+    this.canvasContext.lineTo(this.canvas.nativeElement.width, this.canvas.nativeElement.height / 2);
     this.canvasContext.stroke();
   }
 
