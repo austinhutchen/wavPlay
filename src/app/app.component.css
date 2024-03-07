@@ -7,8 +7,15 @@ canvas {
   height: 20vh;
   background-color: #f5f5f5;
   border: 1px solid #ccc;
+  border-radius: 20px 20px 10px 10px;
 }
-
+h1{
+  
+  background-color: #198754;
+  color: whitesmoke;
+  font-size: 2vh;
+  border-radius: 10px 10px 5px 5px;
+}
 button {
   display: inline-block;
   margin: 1vh;
@@ -24,4 +31,6 @@ button {
 button:disabled {
   background-color: #ccc;
 }
-
+body{
+  background-color: rgb(100, 128, 128);
+}

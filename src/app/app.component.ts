@@ -20,11 +20,11 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.canvasContext = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
   }
-init() {
-  this.audioContext.resume().then(() => {
-    this.startRecording();
-  });
-}
+  init() {
+    this.audioContext.resume().then(() => {
+      this.startRecording();
+    });
+  }
   startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
@@ -56,7 +56,7 @@ init() {
 
     this.analyser.getByteTimeDomainData(this.dataArray);
 
-    this.canvasContext.fillStyle = 'rgb(200, 200, 200)';
+    this.canvasContext.fillStyle = 'rgb(100, 150, 200)';
     this.canvasContext.fillRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
 
     this.canvasContext.lineWidth = 2;
@@ -85,9 +85,8 @@ init() {
   }
 
   stopRecording() {
-    if (this.mediaRecorder) {
-      this.mediaRecorder.stop();
-    }
+    (!this.mediaRecorder) ? true : this.mediaRecorder.stop();
+
   }
 }
 
