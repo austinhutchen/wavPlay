@@ -8,7 +8,6 @@ import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
   standalone: true
 })
 export class AppComponent implements AfterViewInit {
-
   title = 'Audio Recorder';
   chunks: Blob[] = [];
   mediaRecorder: any;
@@ -42,15 +41,15 @@ export class AppComponent implements AfterViewInit {
           this.chunks.push(e.data);
         };
 
-        this.mediaRecorder.onstop = () => {
-          let blob = new Blob(this.chunks, { 'type': 'audio/ogg; codecs=opus' });
-          let audioURL = window.URL.createObjectURL(blob);
-          let audio = new Audio(audioURL);
-          audio.play();
-        };
+
       });
   }
-
+  playBack(){
+    let blob = new Blob(this.chunks, { 'type': 'audio/ogg; codecs=opus' });
+    let audioURL = window.URL.createObjectURL(blob);
+    let audio = new Audio(audioURL);
+    audio.play();
+  }
   draw() {
     requestAnimationFrame(() => this.draw());
 
@@ -76,17 +75,14 @@ export class AppComponent implements AfterViewInit {
       } else {
         this.canvasContext.lineTo(x, y);
       }
-
       x += sliceWidth;
     }
-
     this.canvasContext.lineTo(this.canvas.nativeElement.width, this.canvas.nativeElement.height / 2);
     this.canvasContext.stroke();
   }
 
   stopRecording() {
-    (!this.mediaRecorder) ? true : this.mediaRecorder.stop();
-
+    (this.mediaRecorder) ? this.mediaRecorder.stop() : true;
   }
 }
 

@@ -1,13 +1,20 @@
 <!-- app.component.html -->
-<header>
- <h1> <b>{{ title }}</b> </h1>
-</header>
-<body>
- <button (click)="init()">Start</button>
- <button (click)="stopRecording()">Pause Recording</button>
-</body>
-<footer>
- <canvas #canvas width="500" height="300"></canvas>
-</footer>
+<html>
+ <header align="center">
+  <h1> <b>{{ title }}</b> </h1>
+  <button (click)="init()">Record</button>
+  <button (click)="stopRecording()">Pause</button>
+ <button (click)="playBack()">PlayBack</button>
+ </header>
+ <body>
+  <canvas #canvas width="500" height="300"></canvas>
+ </body>
+ <footer>
+ 
+ </footer>
+
+
+</html>
+
 
 
