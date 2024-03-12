@@ -29,8 +29,8 @@ button {
   border: none;
   border-radius: 0.8vh;
   cursor: pointer;
-  height: 7svh;
-  width: 9svh;
+  max-height: 7svh;
+  max-width: 9svh;
   
 }
 
