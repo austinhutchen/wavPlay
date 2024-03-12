@@ -21,13 +21,13 @@ h1{
 }
 button {
   display: inline-block;
-  margin: 1vh;
-  padding: 1vh;
-  font-size: 2vh;
+  margin: 1svh;
+  padding: 1svh 2svh;
+  font-size: 2svh;
   color: #fff;
   background-color: #007bff;
   border: none;
-  border-radius: 0.6vh;
+  border-radius: 0.6svh;
   cursor: pointer;
   max-height: 7svh;
   max-width: 9svh;
