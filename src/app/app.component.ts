@@ -25,12 +25,9 @@ export class AppComponent implements AfterViewInit {
     (!this.audioContext) ? this.audioContext = new AudioContext() : this.audioContext.resume().then(() => {
       this.startRecording();
     });
-
-
   }
 
   startRecording() {
-    
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
         if (!this.audioContext) {
@@ -40,7 +37,6 @@ export class AppComponent implements AfterViewInit {
         this.analyser = this.audioContext.createAnalyser();
         source.connect(this.analyser);
         this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-        this.draw();
 
         this.mediaRecorder = new MediaRecorder(stream);
         this.mediaRecorder.start(1000);
@@ -48,6 +44,9 @@ export class AppComponent implements AfterViewInit {
         this.mediaRecorder.ondataavailable = (e: BlobEvent) => {
           this.chunks.push(e.data);
         };
+
+        // Call draw method after the audio context is fully initialized
+        this.draw();
       })
       .catch(error => {
         console.error('Error accessing microphone:', error);
@@ -55,13 +54,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   playBack() {
-
     let blob = new Blob(this.chunks, { 'type': 'audio/ogg; codecs=opus' });
     let audioURL = window.URL.createObjectURL(blob);
     let audio = new Audio(audioURL);
-
     audio.play();
-
   }
 
   draw() {
