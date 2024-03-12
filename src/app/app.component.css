@@ -23,12 +23,15 @@ button {
   display: inline-block;
   margin: 1vh;
   padding: 1vh 2vh;
-  font-size: 1.6vh;
+  font-size: 2vh;
   color: #fff;
   background-color: #007bff;
   border: none;
-  border-radius: 0.5vh;
+  border-radius: 0.8vh;
   cursor: pointer;
+  height: 7svh;
+  width: 9svh;
+  
 }
 
 button:disabled {
