@@ -8,7 +8,7 @@ import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 })
 export class AppComponent implements AfterViewInit {
   isPaused: boolean = false;
-  title = 'Audio Recorder';
+  title = 'Audio Spectrogram';
   chunks: Blob[] = [];
   mediaRecorder: any;
   audioContext: AudioContext | null = null; // Initialize audioContext as null
