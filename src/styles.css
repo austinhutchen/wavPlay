@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 html{
 background-color: rgb(58, 17, 17);
-
+background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(39,39,133,1) 35%, rgba(16,140,204,1) 73%, rgba(14,148,210,1) 76%, rgba(68,134,154,1) 88%, rgba(0,212,255,1) 100%);
 }

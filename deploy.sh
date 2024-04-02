@@ -1,1 +1,1 @@
-{ git add -A; git commit -m "deploy"; git push origin HEAD:main ; }
+{ git add -A; git commit -m "trivial fixes"; git push origin HEAD:main ; }
