@@ -3,7 +3,7 @@ https://wavplay.vercel.app/
 <br/>
 ![Screenshot 2024-03-13 at 1 25 35 PM](https://github.com/austinhutchen/wavPlay/assets/93489691/47532616-4cc4-454a-9610-7a3dc2085008)
 
-<h2> This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.5.
+<h2> This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.5. I integrated it into my website at <a href="https://austinhutchen.vercel.app/#/Gallery">My site!</a>
  </h2>
 <hr/>
 <ul>
