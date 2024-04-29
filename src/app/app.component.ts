@@ -1,5 +1,53 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+class FFT {
+  static fft(inputArray: Float32Array): Float32Array {
+    const N = inputArray.length;
+    const outputArray = new Float32Array(N * 2); // Complex array (real and imaginary parts interleaved)
+
+    FFT.fftRecursive(inputArray, outputArray, N);
+
+    return outputArray;
+  }
+
+  private static fftRecursive(inputArray: Float32Array, outputArray: Float32Array, N: number) {
+    if (N <= 1) return;
+
+    // Divide the input array into even and odd parts
+    const inputEven = new Float32Array(N / 2);
+    const inputOdd = new Float32Array(N / 2);
+    for (let i = 0; i < N / 2; i++) {
+      inputEven[i] = inputArray[i * 2];
+      inputOdd[i] = inputArray[i * 2 + 1];
+    }
+
+    // Recursively compute FFT on even and odd parts
+    FFT.fftRecursive(inputEven, outputArray, N / 2);
+    FFT.fftRecursive(inputOdd, outputArray, N / 2);
+
+    // Combine results
+    for (let k = 0; k < N / 2; k++) {
+      const theta = -2 * Math.PI * k / N;
+      const twiddleReal = Math.cos(theta);
+      const twiddleImag = Math.sin(theta);
+
+      const evenReal = outputArray[k * 4];
+      const evenImag = outputArray[k * 4 + 1];
+      const oddReal = outputArray[(k + N / 2) * 4];
+      const oddImag = outputArray[(k + N / 2) * 4 + 1];
+
+      const oddTimesTwiddleReal = oddReal * twiddleReal - oddImag * twiddleImag;
+      const oddTimesTwiddleImag = oddReal * twiddleImag + oddImag * twiddleReal;
+
+      outputArray[k * 4] = evenReal + oddTimesTwiddleReal;
+      outputArray[k * 4 + 1] = evenImag + oddTimesTwiddleImag;
+      outputArray[(k + N / 2) * 4] = evenReal - oddTimesTwiddleReal;
+      outputArray[(k + N / 2) * 4 + 1] = evenImag - oddTimesTwiddleImag;
+    }
+  }
+}
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,20 +59,113 @@ export class AppComponent implements AfterViewInit {
   title = 'Audio Recorder';
   chunks: Blob[] = [];
   mediaRecorder: any;
-  audioContext: AudioContext | null = null; // Initialize audioContext as null
-  analyser: AnalyserNode | null = null; // Initialize analyser as null
-  dataArray: Uint8Array | null = null; // Initialize dataArray as null
+  audioContext: AudioContext | null = null;
+  analyser: AnalyserNode | null = null;
+  dataArray: Uint8Array | null = null;
+  scene: THREE.Scene = new THREE.Scene(); // Initialize properties
+  camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera();
+  renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer();
+  controls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement);
+  cubes: THREE.Mesh[] = [];
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
   canvasContext!: CanvasRenderingContext2D;
 
   ngAfterViewInit() {
     this.canvasContext = this.canvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.initAudio();
+    this.initThree();
   }
 
   start() {
     (!this.audioContext) ? this.audioContext = new AudioContext() : this.audioContext.resume().then(() => {
       this.startRecording();
     });
+  }
+  initAudio() {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        this.analyser = this.audioContext!.createAnalyser();
+        const microphone = this.audioContext!.createMediaStreamSource(stream);
+        microphone.connect(this.analyser!);
+        this.analyser!.fftSize = 256;
+        const bufferLength = this.analyser!.frequencyBinCount;
+        this.dataArray = new Uint8Array(bufferLength);
+        this.render();
+      })
+      .catch(error => {
+        console.error('Error accessing microphone:', error);
+      });
+  }
+  initThree() {
+    // Create a new canvas element for WebGL rendering
+    const canvas = document.createElement('canvas');
+    document.body.appendChild(canvas);
+    // Initialize Three.js components with the new canvas
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    // Set camera position
+    this.camera.position.set(0, 0, 50);
+    // Add resize listener
+    window.addEventListener('resize', () => this.onWindowResize());
+    // Create cubes
+    this.createCubes();
+    // Start rendering loop
+    this.render();
+  }
+
+
+  createCubes() {
+    const rows = 8;
+    const cols = 32;
+    const cubeSize = 2;
+    const cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.position.set(x * cubeSize - (cols * cubeSize) / 2, y * cubeSize - (rows * cubeSize) / 2, 0);
+        this.scene.add(cube);
+        this.cubes.push(cube);
+      }
+    }
+  }
+
+  render() {
+    if (this.analyser && this.dataArray) {
+      this.analyser.getByteFrequencyData(this.dataArray);
+
+      const fftData: Float32Array = Float32Array.from(this.dataArray);
+      const fftResult = FFT.fft(fftData);
+      const fftMagnitude = fftResult.map((value: number) => Math.abs(value));
+
+      for (let i = 0; i < this.cubes.length; i++) {
+        const scale = fftMagnitude[i] / 255 * 10; // Adjust scale factor as needed
+        this.cubes[i].scale.z = Math.max(scale, 0.1); // Ensure scale is not zero
+      }
+    }
+
+    // Render the scene
+    this.renderer.render(this.scene, this.camera);
+
+    // Request next frame after a delay (e.g., 30 frames per second)
+    setTimeout(() => {
+      requestAnimationFrame(() => this.render());
+    }, 1000 / 30); // Adjust frame rate as needed
+  }
+
+  onWindowResize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
   startRecording() {
